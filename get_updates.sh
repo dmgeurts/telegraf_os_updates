@@ -15,6 +15,7 @@ loc_domain="domain.local"
 updates=0
 security=0
 local_repo=0
+others=0
 
 # Detect the OS type
 declare $(cat /etc/os-release | grep ^ID)
@@ -32,12 +33,14 @@ if [ "$method" == "apt" ]; then
   updates=$(grep "\-updates" <<< "$installs" | wc -l)
   security=$(grep "\-security" <<< "$installs" | wc -l)
   local_repo=$(grep "$loc_domain" <<< "$installs" | wc -l)
+  others=$(wc -l <<< "$installs")
+  others=$((others-updates-security-local_repo))
 elif [ "$method" == "dnf" ]; then
   echo "dnf work not finished yet"
   exit 1
 fi
 
 # Feed data to Telegraf
-printf 'linux_updates updates=%di,security=%di,local=%di\n' "$updates" "$security" "$local_repo"
+printf 'linux_updates updates=%di,security=%di,local=%di,others=%di\n' "$updates" "$security" "$local_repo" "$others"
 
 # EOF
