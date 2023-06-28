@@ -11,7 +11,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Variables
-loc_domain="ipnexia.com"
+loc_domain="domain.local"
 
 # Detect the OS type
 declare $(cat /etc/os-release | grep ^ID)
