@@ -30,7 +30,7 @@ fi
 if [ "$method" == "apt" ]; then
   apt update > /dev/null 2>&1
   installs=$(apt-get -s dist-upgrade -V | grep ^Inst)
-  if [ ! -z $installs ]; then
+  if [ ! -z "$installs" ]; then
     updates=$(grep "\-updates" <<< "$installs" | grep -v "\-security" | wc -l)
     security=$(grep "\-security" <<< "$installs" | wc -l)
     local_repo=$(grep "$loc_domain" <<< "$installs" | wc -l)
