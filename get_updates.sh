@@ -12,6 +12,9 @@ fi
 
 # Variables
 loc_domain="domain.local"
+updates=0
+security=0
+local_repo=0
 
 # Detect the OS type
 declare $(cat /etc/os-release | grep ^ID)
@@ -25,35 +28,16 @@ fi
 # Grab available updates
 if [ "$method" == "apt" ]; then
   apt update > /dev/null 2>&1
-  updates=$(apt-get -s dist-upgrade -V | grep ^Inst)
-  COLUMN=4
-  # Create empty array
-  declare -A type
-  # Fill associative array
-  while read -a line; do
-    type[${line[$COLUMN]:-(empty)}]=$((type[${line[$COLUMN]:-(empty)}]+1));
-  done <<< "$updates"
+  installs=$(apt-get -s dist-upgrade -V | grep ^Inst)
+  updates=$(grep "\-updates" <<< "$installs" | wc -l)
+  security=$(grep "\-security" <<< "$installs" | wc -l)
+  local_repo=$(grep "$loc_domain" <<< "$installs" | wc -l)
 elif [ "$method" == "dnf" ]; then
   echo "dnf work not finished yet"
   exit 1
 fi
 
 # Feed data to Telegraf
-if [ ${#type[@]} -eq 0 ]; then
-  updates=0
-  security=0
-  local_repo=0
-else
-  for key in ${!type[@]}; do
-    if [[ "key" == *"$loc_domain"* ]]; then
-      local_repo=${type[$key]}
-    elif [[ "key" == *"-security"* ]]; then
-      security=${type[$key]}
-    elif [[ "key" == *"-updates"* ]]; then
-      updates=${type[$key]}
-    fi
-  done
-fi
 printf 'linux_updates updates=%di,security=%di,local=%di\n' "$updates" "$security" "$local_repo"
 
 # EOF
