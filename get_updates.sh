@@ -30,11 +30,13 @@ fi
 if [ "$method" == "apt" ]; then
   apt update > /dev/null 2>&1
   installs=$(apt-get -s dist-upgrade -V | grep ^Inst)
-  updates=$(grep "\-updates" <<< "$installs" | grep -v "\-security" | wc -l)
-  security=$(grep "\-security" <<< "$installs" | wc -l)
-  local_repo=$(grep "$loc_domain" <<< "$installs" | wc -l)
-  others=$(wc -l <<< "$installs")
-  others=$((others-updates-security-local_repo))
+  if [ ! -z $installs ]; then
+    updates=$(grep "\-updates" <<< "$installs" | grep -v "\-security" | wc -l)
+    security=$(grep "\-security" <<< "$installs" | wc -l)
+    local_repo=$(grep "$loc_domain" <<< "$installs" | wc -l)
+    others=$(wc -l <<< "$installs")
+    others=$((others-updates-security-local_repo))
+  fi
 elif [ "$method" == "dnf" ]; then
   echo "dnf work not finished yet"
   exit 1
