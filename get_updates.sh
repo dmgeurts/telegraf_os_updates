@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script for Telegraf to grab the pending updates
 # Author: Djerk Geurts <djerk@maizymoo.com>
-# Version: 2023-06-28 v1.00
+# Version: 2023-06-30 v1.01
 #
 # Run (as root,) from Telegraf
 
