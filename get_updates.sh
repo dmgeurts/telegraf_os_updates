@@ -19,7 +19,7 @@ others=0
 
 # Detect the OS type
 declare $(cat /etc/os-release | grep ^ID)
-if [ "$ID_LIKE" == "debian" ]; then
+if [ "$ID_LIKE" == "debian" ] || [ "$ID" == "debian" ]; then
   method="apt"
 elif [ "ID" == "fedora" ]; then
   ID_LIKE="$ID"
@@ -31,8 +31,8 @@ if [ "$method" == "apt" ]; then
   apt update > /dev/null 2>&1
   installs=$(apt-get -s dist-upgrade -V | grep ^Inst)
   if [ ! -z "$installs" ]; then
-    updates=$(grep "\-updates" <<< "$installs" | grep -v "\-security" | wc -l)
-    security=$(grep "\-security" <<< "$installs" | wc -l)
+    updates=$(grep -i "\-updates" <<< "$installs" | grep -iv "\-security" | wc -l)
+    security=$(grep -i "\-security" <<< "$installs" | wc -l)
     local_repo=$(grep "$loc_domain" <<< "$installs" | wc -l)
     others=$(wc -l <<< "$installs")
     others=$((others-updates-security-local_repo))
