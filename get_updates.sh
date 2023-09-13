@@ -41,9 +41,12 @@ if [ "$method" == "apt" ]; then
     others=$((others-updates-security-local_repo))
   fi
 elif [ "$method" == "dnf" ]; then
-  updates=$(dnf check-update | grep -Ec ' updates$')
+  installs=$(dnf check-update | grep -vE -e "^$" -e "^Last metadata ")
   if [ ! -z "$updates" ]; then
-    security=$(dnf updateinfo list | grep -Ec 'Important/Sec. ')
+    security=$(dnf updateinfo list | grep -Ec '/Sec. ')
+    updates=$(($(grep -Ec ' updates( *)$' <<< "$installs")-security))
+    local_repo=$(grep -vEc -e '^$' -e '^Last metadata' -e ' updates( *)$' <<< "$installs")
+    #others=
   fi
 fi
 
