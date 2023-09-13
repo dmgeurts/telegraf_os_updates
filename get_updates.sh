@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script for Telegraf to grab the pending updates
 # Author: Djerk Geurts <djerk@maizymoo.com>
-# Version: 2023-06-30 v1.01
+# Version: 2023-09-13 v1.02
 #
 # Run (as root,) from Telegraf
 
@@ -21,9 +21,12 @@ others=0
 declare $(cat /etc/os-release | grep ^ID)
 if [ "$ID_LIKE" == "debian" ] || [ "$ID" == "debian" ]; then
   method="apt"
-elif [ "ID" == "fedora" ]; then
+elif [ "$ID" == "fedora" ]; then
   ID_LIKE="$ID"
   method="dnf"
+else
+  echo "Unknown OS"
+  exit 1
 fi
 
 # Grab available updates
@@ -38,8 +41,10 @@ if [ "$method" == "apt" ]; then
     others=$((others-updates-security-local_repo))
   fi
 elif [ "$method" == "dnf" ]; then
-  echo "dnf work not finished yet"
-  exit 1
+  updates=$(dnf check-update | grep -Ec ' updates$')
+  if [ ! -z "$updates" ]; then
+    security=$(dnf updateinfo list | grep -Ec 'Important/Sec. ')
+  fi
 fi
 
 # Feed data to Telegraf
