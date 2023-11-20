@@ -1,4 +1,5 @@
 # telegraf_os_updates
+
 Simple bash script for Telegraf [[inputs.exec]] to grab pending updates
 
 ## script config
@@ -7,7 +8,7 @@ Set variable `loc_domain` to the domain of a local repository.
 
 ## Telegraf config
 
-```
+```text
 # Pending updates
 [[inputs.exec]]
   commands = ["sudo /usr/local/bin/get_updates.sh"]
@@ -20,6 +21,6 @@ Set variable `loc_domain` to the domain of a local repository.
 
 `sudo visudo /etc/sudoers.d/telegraf`
 
-```
+```text
 telegraf ALL = NOPASSWD: /usr/local/bin/get_updates.sh
 ```
