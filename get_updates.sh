@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script for Telegraf to grab the pending updates
 # Author: Djerk Geurts <djerk@maizymoo.com>
-# Version: 2023-09-13 v1.02
+# Version: 2024-05-28 v1.03
 #
 # Run (as root,) from Telegraf
 
@@ -41,11 +41,11 @@ if [ "$method" == "apt" ]; then
     others=$((others-updates-security-local_repo))
   fi
 elif [ "$method" == "dnf" ]; then
-  installs=$(dnf check-update | grep -vE -e "^$" -e "^Last metadata ")
-  if [ ! -z "$updates" ]; then
+  installs=$(dnf check-update | grep -vE -e "^$" -e "^Last metadata " -e "running version" -e "installed security update")
+  if [ ! -z "$installs" ]; then
     security=$(dnf updateinfo list | grep -Ec '/Sec. ')
     updates=$(($(grep -Ec ' updates( *)$' <<< "$installs")-security))
-    local_repo=$(grep -vEc -e '^$' -e '^Last metadata' -e ' updates( *)$' <<< "$installs")
+    local_repo=$(grep -vEc ' updates( *)$' <<< "$installs")
     #others=
   fi
 fi
